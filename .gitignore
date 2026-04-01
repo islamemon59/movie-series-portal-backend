@@ -1,0 +1,7 @@
+.env
+node_modules/
+dist/
+*.js
+*.d.ts
+*.js.map
+!prisma/**
