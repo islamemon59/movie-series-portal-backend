@@ -4,7 +4,7 @@ import type {
   UpdateMediaInput,
   MediaQueryInput,
 } from "./media.schema.js";
-import type { Prisma } from "@prisma/client";
+import type { Prisma } from "../../generated/prisma/client.js";
 import { AppError } from "../../types/index.js";
 
 export const mediaService = {
