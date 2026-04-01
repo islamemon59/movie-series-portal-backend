@@ -1,0 +1,190 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum MediaType {
+  MOVIE
+  SERIES
+}
+
+enum Pricing {
+  FREE
+  PREMIUM
+}
+
+enum ReviewStatus {
+  PENDING
+  PUBLISHED
+  UNPUBLISHED
+}
+
+enum SubscriptionPlan {
+  MONTHLY
+  YEARLY
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  EXPIRED
+}
+
+// ─── Better Auth Models ──────────────────────────────────────
+
+model User {
+  id            String   @id
+  name          String
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  image         String?
+  role          Role     @default(USER)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  sessions      Session[]
+  accounts      Account[]
+  reviews       Review[]
+  comments      Comment[]
+  likes         Like[]
+  watchlist     Watchlist[]
+  subscriptions Subscription[]
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// ─── Application Models ──────────────────────────────────────
+
+model Media {
+  id                 String    @id @default(cuid())
+  title              String
+  synopsis           String
+  type               MediaType
+  genres             String[]
+  releaseYear        Int
+  director           String
+  cast               String[]
+  streamingPlatforms String[]
+  posterUrl          String?
+  trailerUrl         String?
+  pricing            Pricing   @default(FREE)
+  featured           Boolean   @default(false)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  reviews        Review[]
+  watchlistItems Watchlist[]
+}
+
+model Review {
+  id         String       @id @default(cuid())
+  rating     Int
+  content    String
+  tags       String[]
+  hasSpoiler Boolean      @default(false)
+  status     ReviewStatus @default(PENDING)
+  userId     String
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mediaId    String
+  media      Media        @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  comments Comment[]
+  likes    Like[]
+}
+
+model Comment {
+  id        String    @id @default(cuid())
+  content   String
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviewId  String
+  review    Review    @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  parentId  String?
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   Comment[] @relation("CommentReplies")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviewId  String
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, reviewId])
+}
+
+model Watchlist {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mediaId   String
+  media     Media    @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, mediaId])
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  userId               String
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripeCustomerId     String?
+  stripeSubscriptionId String?            @unique
+  plan                 SubscriptionPlan
+  status               SubscriptionStatus @default(ACTIVE)
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+}
