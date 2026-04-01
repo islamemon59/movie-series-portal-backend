@@ -46,7 +46,7 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
 // ─── Better Auth Handler ──────────────────────────────────────
-app.all("/api/auth/*splat", toNodeHandler(auth));
+app.all("/api/auth/*", toNodeHandler(auth));
 
 // ─── API Routes ───────────────────────────────────────────────
 app.get("/api/health", (_req, res) => {
