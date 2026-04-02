@@ -49,7 +49,7 @@ app.use(express.urlencoded({ extended: true }));
 app.all("/api/auth/*", toNodeHandler(auth));
 
 // ─── API Routes ───────────────────────────────────────────────
-app.get("/api/health", (_req, res) => {
+app.get("/", (_req, res) => {
   res.json({
     success: true,
     message: "MovieHub API is running",
