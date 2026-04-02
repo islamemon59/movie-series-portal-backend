@@ -9,7 +9,7 @@ export const auth = betterAuth({
   }),
   baseURL: env.BETTER_AUTH_URL,
   secret: env.BETTER_AUTH_SECRET,
-  trustedOrigins: [env.FRONTEND_URL],
+  trustedOrigins: env.FRONTEND_URL.split(",").map((u) => u.trim()),
   emailAndPassword: {
     enabled: true,
   },

@@ -20,6 +20,8 @@ import type { AuthenticatedRequest } from "./types/index.js";
 const app = express();
 
 // ─── Security & CORS ─────────────────────────────────────────
+const allowedOrigins = env.FRONTEND_URL.split(",").map((u) => u.trim());
+
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
@@ -27,7 +29,7 @@ app.use(
 );
 app.use(
   cors({
-    origin: env.FRONTEND_URL,
+    origin: allowedOrigins,
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
