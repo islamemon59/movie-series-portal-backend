@@ -20,7 +20,9 @@ import type { AuthenticatedRequest } from "./types/index.js";
 const app = express();
 
 // ─── Security & CORS ─────────────────────────────────────────
-const allowedOrigins = env.FRONTEND_URL.split(",").map((u) => u.trim());
+const allowedOrigins = env.FRONTEND_URL.split(",").map((u) =>
+  u.trim().replace(/\/+$/, ""),
+);
 
 app.use(
   helmet({

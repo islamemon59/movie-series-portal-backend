@@ -1,16 +1,31 @@
 import { z } from "zod";
 
+const csvOrArrayField = z
+  .union([
+    z.array(z.string()),
+    z.string(),
+  ])
+  .transform((value) => {
+    const raw = Array.isArray(value) ? value : value.split(",");
+    return raw.map((item) => item.trim()).filter(Boolean);
+  })
+  .pipe(z.array(z.string().min(1)).min(1));
+
+const optionalUrlField = z
+  .union([z.string().url(), z.string().length(0), z.undefined()])
+  .transform((value) => (value ? value : undefined));
+
 export const createMediaSchema = z.object({
-  title: z.string().min(1).max(200),
-  synopsis: z.string().min(10).max(5000),
+  title: z.string().trim().min(1).max(200),
+  synopsis: z.string().trim().min(10).max(5000),
   type: z.enum(["MOVIE", "SERIES"]),
-  genres: z.array(z.string().min(1)).min(1),
-  releaseYear: z.number().int().min(1900).max(2030),
-  director: z.string().min(1).max(200),
-  cast: z.array(z.string().min(1)).min(1),
-  streamingPlatforms: z.array(z.string().min(1)).min(1),
-  posterUrl: z.string().url().optional().or(z.literal("")),
-  trailerUrl: z.string().url().optional().or(z.literal("")),
+  genres: csvOrArrayField,
+  releaseYear: z.coerce.number().int().min(1900).max(2030),
+  director: z.string().trim().min(1).max(200),
+  cast: csvOrArrayField,
+  streamingPlatforms: csvOrArrayField,
+  posterUrl: optionalUrlField,
+  trailerUrl: optionalUrlField,
   pricing: z.enum(["FREE", "PREMIUM"]).default("FREE"),
   featured: z.boolean().default(false),
 });
