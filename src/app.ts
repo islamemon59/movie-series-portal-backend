@@ -15,7 +15,8 @@ import { watchlistRoutes } from "./modules/watchlist/watchlist.routes.js";
 import { paymentRoutes } from "./modules/payment/payment.routes.js";
 import { paymentController } from "./modules/payment/payment.controller.js";
 import { adminRoutes } from "./modules/admin/admin.routes.js";
-import type { AuthenticatedRequest } from "./types/index.js";
+import { managerRoutes } from "./modules/manager/manager.routes.js";
+import { userRoutes } from "./modules/user/user.routes.js";
 
 const app = express();
 
@@ -67,6 +68,8 @@ app.use("/api/comments", commentRoutes);
 app.use("/api/watchlist", watchlistRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/manager", managerRoutes);
+app.use("/api/users", userRoutes);
 
 // ─── Error Handling ───────────────────────────────────────────
 app.use(notFoundHandler);

@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { mediaService } from "./media.service.js";
 import { mediaQuerySchema } from "./media.schema.js";
+import type { AuthenticatedRequest } from "../../types/index.js";
 
 export const mediaController = {
   async getAll(req: Request, res: Response, next: NextFunction) {
@@ -91,6 +92,30 @@ export const mediaController = {
   async getPlatforms(_req: Request, res: Response, next: NextFunction) {
     try {
       const data = await mediaService.getPlatforms();
+      res.json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getSuggestions(req: Request, res: Response, next: NextFunction) {
+    try {
+      const query = String(req.query.q || "");
+      const limit = Number(req.query.limit || 6);
+      const data = await mediaService.getSuggestions(query, limit);
+      res.json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getRecommendations(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const data = await mediaService.getRecommendations(req.user?.id);
       res.json({ success: true, data });
     } catch (error) {
       next(error);

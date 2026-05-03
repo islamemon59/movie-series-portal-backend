@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { mediaController } from "./media.controller.js";
-import { requireAdmin } from "../../middleware/auth.js";
+import { optionalAuth, requireAdmin } from "../../middleware/auth.js";
 import { validate } from "../../middleware/validate.js";
 import { createMediaSchema, updateMediaSchema } from "./media.schema.js";
 
@@ -13,7 +13,9 @@ router.get("/top-rated", mediaController.getTopRated);
 router.get("/newly-added", mediaController.getNewlyAdded);
 router.get("/genres", mediaController.getGenres);
 router.get("/platforms", mediaController.getPlatforms);
-router.get("/:id", mediaController.getById);
+router.get("/suggestions", mediaController.getSuggestions);
+router.get("/recommendations", optionalAuth, mediaController.getRecommendations as any);
+router.get("/:id", optionalAuth, mediaController.getById);
 
 // Admin routes
 router.post(

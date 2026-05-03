@@ -12,6 +12,8 @@ const envSchema = z.object({
   BETTER_AUTH_URL: z.string().url().default("http://localhost:5000"),
   GOOGLE_CLIENT_ID: z.string().min(1),
   GOOGLE_CLIENT_SECRET: z.string().min(1),
+  FACEBOOK_CLIENT_ID: z.string().optional(),
+  FACEBOOK_CLIENT_SECRET: z.string().optional(),
   STRIPE_SECRET_KEY: z.string().min(1),
   STRIPE_WEBHOOK_SECRET: z.string().min(1),
   STRIPE_MONTHLY_PRICE_ID: z.string().min(1),
